@@ -21,13 +21,6 @@ AAWeapon::AAWeapon()
 void AAWeapon::BeginPlay()
 {
 	Super::BeginPlay();
-	UWorld* World  = GetWorld();
-	if(World)
-	{
-		FVector Location = GetActorLocation();
-		DrawDebugSphere(World, Location, 2.f, 2, FColor::Purple, false, 5.f);
-	}
-	
 	
 }
 
