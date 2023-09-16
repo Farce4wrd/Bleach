@@ -15,6 +15,9 @@ ASoulReaper::ASoulReaper()
 void ASoulReaper::BeginPlay()
 {
 	Super::BeginPlay();
+	FlashStep = 3.0;
+	MaxFlashStep = 3.0;
+	FSRegen = 0.03;
 	
 	
 }
