@@ -14,6 +14,7 @@ AAWeapon::AAWeapon()
 	RootComponent = WeaponMesh;
 	WeaponBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Weapon HitBox"));
 	WeaponBox -> SetupAttachment(GetRootComponent());
+	WeaponBox -> SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 
 }
 

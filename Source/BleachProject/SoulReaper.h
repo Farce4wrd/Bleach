@@ -54,6 +54,15 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void StopBlocking();
 
+	UFUNCTION(BlueprintCallable, Category="Mobility")
+	void SetAirStateOnJump();
+
+	UFUNCTION(BlueprintCallable, Category="Mobility")
+	void SetAirStateOnLand();
+
+	UFUNCTION(BlueprintPure)
+	bool GetAirState();
+
 private:
 
 	UPROPERTY(EditAnywhere)
@@ -77,6 +86,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	bool isGrabbable;
 
+	UPROPERTY(EditAnywhere)
+	bool isInAir;
+	
 	UPROPERTY(EditAnywhere)
 	bool isCountered;
 

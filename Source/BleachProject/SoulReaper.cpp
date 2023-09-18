@@ -106,6 +106,21 @@ bool ASoulReaper::GetBlockState(){
 	return isBlocking;
 }
 
+bool ASoulReaper::GetAirState()
+{
+	return isInAir;
+}
+
+void ASoulReaper::SetAirStateOnJump()
+{
+	isInAir = true;
+}
+void ASoulReaper::SetAirStateOnLand()
+{
+	isInAir = false;
+}
+
+
 void ASoulReaper::StartBlocking(){
 	isBlocking = true;
 }
