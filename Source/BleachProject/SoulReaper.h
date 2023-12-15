@@ -3,19 +3,23 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DebugMacros.h"
 #include "GameFramework/Character.h"
 #include "CharacterTypes.h"
+#include "Interfaces/HitInterface.h"
 #include "SoulReaper.generated.h"
 
 
+
 UCLASS()
-class BLEACHPROJECT_API ASoulReaper : public ACharacter
+class BLEACHPROJECT_API ASoulReaper : public ACharacter, public IHitInterface
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
 	ASoulReaper();
+	virtual void GetHit(const FVector& ImpactPoint) override;
 
 protected:
 	// Called when the game starts or when spawned

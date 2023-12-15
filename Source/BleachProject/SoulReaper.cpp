@@ -4,12 +4,19 @@
 #include "SoulReaper.h"
 #include "AWeapon.h"
 #include "Components/BoxComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Interfaces/HitInterface.h"
 
 // Sets default values
 ASoulReaper::ASoulReaper()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	GetMesh() -> SetCollisionObjectType(ECC_WorldDynamic);
+	GetMesh() -> SetCollisionResponseToChannel(ECC_Visibility,ECR_Block);
+	GetMesh() -> SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetMesh() -> SetGenerateOverlapEvents(true);
+	GetCapsuleComponent() ->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 
 }
 
@@ -38,6 +45,14 @@ void ASoulReaper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
+
+// Called when the character is hit
+void ASoulReaper::GetHit(const FVector& ImpactPoint)
+{
+	DRAW_SPHERE_COLOR(ImpactPoint, FColor::Orange);
+	UE_LOG(LogTemp, Display, TEXT("I HIT SOMEONE"));
+}
+
 
 //Replenish Flash Step over time
 void ASoulReaper::ReplenishFlashStep(){
