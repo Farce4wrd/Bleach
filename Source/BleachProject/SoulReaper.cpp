@@ -2,6 +2,8 @@
 
 
 #include "SoulReaper.h"
+#include "AWeapon.h"
+#include "Components/BoxComponent.h"
 
 // Sets default values
 ASoulReaper::ASoulReaper()
@@ -122,9 +124,59 @@ void ASoulReaper::SetAirStateOnLand()
 
 
 void ASoulReaper::StartBlocking(){
+	ActionState = EActionState::EAS_Blocking;
 	isBlocking = true;
 }
 
 void ASoulReaper::StopBlocking(){
+	ActionState =EActionState::EAS_Unoccupied;
 	isBlocking = false;
+}
+
+void ASoulReaper::Attack()
+{
+	if(CanAttack())
+	{
+		PlayAttackMontage();
+		ActionState = EActionState::EAS_Attacking;
+	}
+}
+
+bool ASoulReaper::CanAttack()
+{
+	if(ActionState == EActionState::EAS_Unoccupied && ActionState != EActionState::EAS_Blocking)
+	{
+		return true;
+	}else
+	{
+		return false;
+	}
+}
+
+void ASoulReaper::SetWeaponCollisionEnable(ECollisionEnabled::Type CollisionEnabled)
+{
+	//UChildActorComponent* MyWeapon = GetComponentByClass<UChildActorComponent>();
+	UChildActorComponent* HWeapon = GetComponentByClass<UChildActorComponent>();
+	AWeapon* MyWeapon = Cast<AWeapon>(HWeapon -> GetChildActor());
+	if(MyWeapon && MyWeapon ->GetWeaponBox())
+	{
+		MyWeapon -> GetWeaponBox() ->SetCollisionEnabled(CollisionEnabled);
+		// FString name = MyWeapon -> GetName();
+		// FString parentName = MyWeapon -> GetParentActor() ->GetName();
+		// UE_LOG(LogTemp, Display, TEXT("Weapon name: %s"), *name);
+		// UE_LOG(LogTemp, Display, TEXT("Parent name: %s"), *parentName);
+	}
+	
+	
+		
+}
+
+void ASoulReaper::PlayAttackMontage()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if(AnimInstance && AttackMontage)
+	{
+		AnimInstance -> Montage_Play(AttackMontage);
+	}
+	ActionState = EActionState::EAS_Unoccupied;
 }

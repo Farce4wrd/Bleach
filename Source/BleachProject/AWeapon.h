@@ -9,23 +9,34 @@
 class UBoxComponent;
 class UStaticMeshComponent;
 UCLASS()
-class BLEACHPROJECT_API AAWeapon : public AActor
+class BLEACHPROJECT_API AWeapon : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AAWeapon();
+	AWeapon();
+	FORCEINLINE UBoxComponent* GetWeaponBox() const{ return WeaponBox;}
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	void OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 private :
 	UPROPERTY(EditAnywhere, Category="Weapon Properties")
 	UStaticMeshComponent* WeaponMesh;
+	
 	UPROPERTY(EditAnywhere, Category="Weapon Properties")
 	UBoxComponent* WeaponBox;
+	
+	UPROPERTY(VisibleAnywhere)
+	USceneComponent* BoxTraceStart;
+
+	UPROPERTY(VisibleAnywhere)
+	USceneComponent* BoxTraceEnd;
 
 public:	
 	// Called every frame

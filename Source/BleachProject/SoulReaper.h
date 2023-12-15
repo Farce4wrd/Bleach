@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "CharacterTypes.h"
 #include "SoulReaper.generated.h"
+
 
 UCLASS()
 class BLEACHPROJECT_API ASoulReaper : public ACharacter
@@ -63,7 +65,22 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool GetAirState();
 
+	UFUNCTION(BlueprintCallable, Category="Attack")
+	void SetWeaponCollisionEnable(ECollisionEnabled::Type CollisionEnabled);
+
+	UFUNCTION(BlueprintCallable, Category="Attack")
+	void Attack();
+
+	bool CanAttack();
+
+	UFUNCTION(BlueprintCallable, Category="Attack")
+	void PlayAttackMontage();
 private:
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	EActionState ActionState = EActionState::EAS_Unoccupied;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Montages")
+	UAnimMontage* AttackMontage;
 
 	UPROPERTY(EditAnywhere)
 	int SpiritualEnergy;
