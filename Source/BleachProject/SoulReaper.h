@@ -9,7 +9,7 @@
 #include "Interfaces/HitInterface.h"
 #include "SoulReaper.generated.h"
 
-
+class UAnimMontage;
 
 UCLASS()
 class BLEACHPROJECT_API ASoulReaper : public ACharacter, public IHitInterface
@@ -24,6 +24,9 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	
+	UFUNCTION(BlueprintCallable, Category="Attack")
+	void PlayHitReactMontage(const FName& SectionName);
 
 public:	
 	// Called every frame
@@ -31,6 +34,7 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	void DirectionalHitReact(const FVector& ImpactPoint);
 
 	//Activate Flash step
 	UFUNCTION(BlueprintCallable, Category="Mobility")
@@ -79,6 +83,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Attack")
 	void PlayAttackMontage();
+
+	
 private:
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	EActionState ActionState = EActionState::EAS_Unoccupied;
@@ -86,6 +92,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="Montages")
 	UAnimMontage* AttackMontage;
 
+	UPROPERTY(EditDefaultsOnly, Category="Montages")
+	UAnimMontage* HitReactMontage;
+	
 	UPROPERTY(EditAnywhere)
 	int SpiritualEnergy;
 

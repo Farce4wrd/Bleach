@@ -17,6 +17,7 @@ public:
 	// Sets default values for this actor's properties
 	AWeapon();
 	FORCEINLINE UBoxComponent* GetWeaponBox() const{ return WeaponBox;}
+	TArray<AActor*> IgnoreActors;
 
 protected:
 	// Called when the game starts or when spawned

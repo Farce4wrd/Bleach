@@ -3,8 +3,10 @@
 
 #include "SoulReaper.h"
 #include "AWeapon.h"
+#include "NavigationSystem.h"
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Interfaces/HitInterface.h"
 
 // Sets default values
@@ -46,11 +48,52 @@ void ASoulReaper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 }
 
+void ASoulReaper::DirectionalHitReact(const FVector& ImpactPoint)
+{
+	//Forward * ToHit = |Forward| |ToHit| * cos(theta)
+	//|Forward| = 1, |ToHit| = 1, so Forward *ToHit = cos(theta)
+	const FVector Forward = GetActorForwardVector();
+	//Lower Impact Point to the Enemy's Actor Location Z
+	const FVector ImpactLowered(ImpactPoint.X, ImpactPoint.Y, GetActorLocation().Z);
+	const FVector ToHit = (ImpactLowered - GetActorLocation()).GetSafeNormal();
+	const double CosTheta = FVector::DotProduct(Forward, ToHit);
+	//Take the inverse cos to get theta - Angle of hit
+	double Theta = FMath::Acos(CosTheta);
+	//Convert from radians to degrees
+	Theta = FMath::RadiansToDegrees(Theta);
+	//If CrossProduct points down, Theta should be negative
+	const FVector CrossProduct = FVector::CrossProduct(Forward, ToHit);
+	if(CrossProduct.Z <0)
+	{
+		Theta *= -1.f;
+	}
+	FName Section("FromBack");
+	if(Theta >= -45.f && Theta < 45.f)
+	{
+		Section = FName("FromFront");
+	}else if(Theta >=-135 && Theta < -45)
+	{
+		Section = FName("FromLeft");
+	}else if(Theta >= 45 && Theta < 135)
+	{
+		Section = FName("FromRight");
+	}
+	UKismetSystemLibrary::DrawDebugArrow(this,GetActorLocation(), GetActorLocation()+ CrossProduct*100.f,5.f, FColor::Blue,5.f);
+	PlayHitReactMontage(Section);
+
+	if(GEngine)
+	{
+		GEngine -> AddOnScreenDebugMessage(1,5.f, FColor::Green, FString::Printf(TEXT("Theta: %f"), Theta));
+	}
+	UKismetSystemLibrary::DrawDebugArrow(this,GetActorLocation(), GetActorLocation()+ Forward*60.f,5.f, FColor::Red,5.f);
+	UKismetSystemLibrary::DrawDebugArrow(this,GetActorLocation(), GetActorLocation()+ ToHit*60.f,5.f, FColor::Green,5.f);
+}
+
 // Called when the character is hit
 void ASoulReaper::GetHit(const FVector& ImpactPoint)
 {
 	DRAW_SPHERE_COLOR(ImpactPoint, FColor::Orange);
-	UE_LOG(LogTemp, Display, TEXT("I HIT SOMEONE"));
+	DirectionalHitReact(ImpactPoint);
 }
 
 
@@ -176,16 +219,13 @@ void ASoulReaper::SetWeaponCollisionEnable(ECollisionEnabled::Type CollisionEnab
 	if(MyWeapon && MyWeapon ->GetWeaponBox())
 	{
 		MyWeapon -> GetWeaponBox() ->SetCollisionEnabled(CollisionEnabled);
-		// FString name = MyWeapon -> GetName();
-		// FString parentName = MyWeapon -> GetParentActor() ->GetName();
-		// UE_LOG(LogTemp, Display, TEXT("Weapon name: %s"), *name);
-		// UE_LOG(LogTemp, Display, TEXT("Parent name: %s"), *parentName);
+		MyWeapon ->IgnoreActors.Empty();
 	}
 	
 	
 		
 }
-
+//Plays Attack Montage
 void ASoulReaper::PlayAttackMontage()
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -195,3 +235,15 @@ void ASoulReaper::PlayAttackMontage()
 	}
 	ActionState = EActionState::EAS_Unoccupied;
 }
+
+//Plays Hit Montage
+void ASoulReaper::PlayHitReactMontage(const FName& SectionName)
+{
+	UAnimInstance* AnimInstance = GetMesh() -> GetAnimInstance();
+	if(AnimInstance && HitReactMontage)
+	{
+		AnimInstance -> Montage_Play(HitReactMontage);
+		AnimInstance -> Montage_JumpToSection(SectionName,HitReactMontage);
+	}
+}
+
